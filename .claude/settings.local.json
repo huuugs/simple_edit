@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node:*)",
+      "Bash(python3:*)",
+      "Bash(curl:*)",
+      "Bash(pkill:*)",
+      "Bash(cat:*)",
+      "Bash(chmod:*)",
+      "Bash(./test_simple.sh:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
