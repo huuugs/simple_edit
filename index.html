@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>记事本</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
     <style>
         :root {
             --bg-primary: #ffffff;
@@ -1555,6 +1556,561 @@
                 width: 100%;
             }
         }
+
+        /* 表格插入对话框样式 */
+        .table-modal-content {
+            max-width: 450px;
+            width: 90%;
+        }
+
+        .table-config-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .table-config-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .table-config-label {
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 14px;
+            min-width: 60px;
+        }
+
+        .table-config-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .table-config-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2);
+        }
+
+        .table-config-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--text-primary);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .table-config-checkbox input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .table-preview-container {
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--bg-secondary);
+            padding: 15px;
+        }
+
+        .table-preview-title {
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .table-preview {
+            font-family: monospace;
+            font-size: 12px;
+            color: var(--text-secondary);
+            white-space: pre;
+            overflow-x: auto;
+            max-height: 150px;
+            overflow-y: auto;
+            line-height: 1.4;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 15px 20px;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--bg-secondary);
+        }
+
+        .modal-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+            font-family: inherit;
+        }
+
+        .modal-btn-cancel {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .modal-btn-cancel:hover {
+            background-color: var(--bg-tertiary);
+        }
+
+        .modal-btn-confirm {
+            background-color: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .modal-btn-confirm:hover {
+            background-color: #005a9e;
+            border-color: #005a9e;
+        }
+
+        @media (max-width: 480px) {
+            .table-config-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .table-config-label {
+                min-width: auto;
+            }
+
+            .table-config-input {
+                width: 100%;
+            }
+
+            .modal-footer {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .modal-btn {
+                width: 100%;
+            }
+        }
+
+        /* 基础模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: var(--bg-primary);
+            border-radius: 8px;
+            box-shadow: 0 4px 20px var(--shadow-color);
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 20px 0 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .modal-close:hover {
+            background-color: var(--bg-tertiary);
+        }
+
+        .modal-body {
+            padding: 20px;
+            color: var(--text-primary);
+        }
+
+        /* Emoji模态框特定样式 */
+        .emoji-modal-content {
+            width: 600px;
+            height: 500px;
+        }
+
+        .emoji-search-container {
+            margin-bottom: 15px;
+        }
+
+        .emoji-search-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .emoji-categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .emoji-category {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .emoji-category.active {
+            background-color: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .emoji-grid-container {
+            height: 250px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 4px;
+            padding: 8px;
+        }
+
+        .emoji-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 20px;
+            transition: background-color 0.2s;
+        }
+
+        .emoji-item:hover {
+            background-color: var(--bg-tertiary);
+        }
+
+        .emoji-recent-section {
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+        }
+
+        .emoji-section-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .emoji-recent-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        /* 帮助模态框样式 */
+        .help-modal-content {
+            max-width: 800px;
+            width: 95%;
+            max-height: 90vh;
+        }
+
+        .help-section {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .help-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .help-section h3 {
+            color: var(--text-primary);
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .help-section p {
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .help-section ul {
+            color: var(--text-secondary);
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .help-section li {
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+
+        .markdown-help-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .markdown-help-item {
+            background-color: var(--bg-secondary);
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .markdown-help-item strong {
+            color: var(--text-primary);
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .markdown-help-item ul {
+            margin: 0;
+            padding-left: 15px;
+        }
+
+        .markdown-help-item li {
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+
+        .shortcut-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .shortcut-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            background-color: var(--bg-secondary);
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .shortcut-item kbd {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 500;
+            border: 1px solid var(--border-color);
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .shortcut-item span {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .help-section code {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* 状态栏样式增强 */
+        .status-item {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            position: relative;
+        }
+
+        .status-item:hover {
+            color: var(--accent-color);
+        }
+
+        .status-item::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background-color: transparent;
+            transition: background-color 0.2s ease;
+        }
+
+        .status-item:hover::after {
+            background-color: var(--accent-color);
+        }
+
+        /* 设置模态框样式 */
+        .settings-modal-content {
+            max-width: 600px;
+            width: 95%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .settings-section {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .settings-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .settings-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+            font-size: 15px;
+        }
+
+        .settings-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .settings-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--text-primary);
+            min-width: 0;
+            flex: 1;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            cursor: pointer;
+            user-select: none;
+            line-height: 1.3;
+        }
+
+        .settings-info {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .settings-info p {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        @media (max-width: 600px) {
+            .help-modal-content {
+                width: 98%;
+                margin: 10px;
+            }
+
+            .markdown-help-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .shortcut-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .shortcut-item {
+                justify-content: space-between;
+            }
+
+            .help-section h3 {
+                font-size: 16px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1673,7 +2229,14 @@
     <!-- Markdown工具栏 -->
     <div class="markdown-toolbar collapsed" id="markdownToolbar">
         <div class="markdown-content">
-            <!-- 第一行：基础格式 -->
+            <!-- 第一行：特殊功能 -->
+            <div class="markdown-row">
+                <button class="markdown-btn" data-action="emoji" title="表情符号">
+                    🙂
+                </button>
+            </div>
+
+            <!-- 第二行：基础格式 -->
             <div class="markdown-row">
                 <button class="markdown-btn" data-action="bold" title="粗体">
                     <strong>B</strong>
@@ -1684,18 +2247,9 @@
                 <button class="markdown-btn" data-action="strikethrough" title="删除线">
                     <s>S</s>
                 </button>
-                <button class="markdown-btn" data-action="highlight" title="高亮">
-                    <mark>H</mark>
-                </button>
-                <button class="markdown-btn" data-action="superscript" title="上标">
-                    X²
-                </button>
-                <button class="markdown-btn" data-action="subscript" title="下标">
-                    X₂
-                </button>
             </div>
 
-            <!-- 第二行：标题和引用 -->
+            <!-- 第三行：标题 -->
             <div class="markdown-row">
                 <button class="markdown-btn" data-action="h1" title="一级标题">
                     H1
@@ -1706,6 +2260,19 @@
                 <button class="markdown-btn" data-action="h3" title="三级标题">
                     H3
                 </button>
+                <button class="markdown-btn" data-action="h4" title="四级标题">
+                    H4
+                </button>
+                <button class="markdown-btn" data-action="h5" title="五级标题">
+                    H5
+                </button>
+                <button class="markdown-btn" data-action="h6" title="六级标题">
+                    H6
+                </button>
+            </div>
+
+            <!-- 第四行：引用和代码 -->
+            <div class="markdown-row">
                 <button class="markdown-btn" data-action="quote" title="引用">
                     "
                 </button>
@@ -1717,16 +2284,13 @@
                 </button>
             </div>
 
-            <!-- 第三行：列表 -->
+            <!-- 第五行：列表 -->
             <div class="markdown-row">
                 <button class="markdown-btn" data-action="ul" title="无序列表">
                     •
                 </button>
                 <button class="markdown-btn" data-action="ol" title="有序列表">
                     1.
-                </button>
-                <button class="markdown-btn" data-action="tasklist" title="任务列表">
-                    ☐
                 </button>
                 <button class="markdown-btn" data-action="indent" title="缩进">
                     →
@@ -1736,7 +2300,7 @@
                 </button>
             </div>
 
-            <!-- 第四行：链接和媒体 -->
+            <!-- 第六行：链接和媒体 -->
             <div class="markdown-row">
                 <button class="markdown-btn" data-action="link" title="链接">
                     🔗
@@ -1744,18 +2308,9 @@
                 <button class="markdown-btn" data-action="image" title="图片">
                     🖼
                 </button>
-                <button class="markdown-btn" data-action="email" title="邮箱">
-                    ✉
-                </button>
-                <button class="markdown-btn" data-action="video" title="视频">
-                    ▶
-                </button>
-                <button class="markdown-btn" data-action="audio" title="音频">
-                    ♪
-                </button>
             </div>
 
-            <!-- 第五行：表格和分隔 -->
+            <!-- 第七行：表格和分隔 -->
             <div class="markdown-row">
                 <button class="markdown-btn" data-action="table" title="表格">
                     ⊞
@@ -1763,33 +2318,8 @@
                 <button class="markdown-btn" data-action="hr" title="分割线">
                     ---
                 </button>
-                <button class="markdown-btn" data-action="toc" title="目录">
-                    ≡
-                </button>
                 <button class="markdown-btn" data-action="footnote" title="脚注">
                     ※
-                </button>
-                <button class="markdown-btn" data-action="math" title="数学公式">
-                    ∑
-                </button>
-            </div>
-
-            <!-- 第六行：特殊格式 -->
-            <div class="markdown-row">
-                <button class="markdown-btn" data-action="emoji" title="表情符号">
-                    🙂
-                </button>
-                <button class="markdown-btn" data-action="date" title="日期时间">
-                    📅
-                </button>
-                <button class="markdown-btn" data-action="mermaid" title="流程图">
-                    〰
-                </button>
-                <button class="markdown-btn" data-action="details" title="折叠内容">
-                    ▼
-                </button>
-                <button class="markdown-btn" data-action="mark" title="标记文本">
-                    📌
                 </button>
             </div>
         </div>
@@ -1835,6 +2365,209 @@
                         <!-- 最近使用的emoji将显示在这里 -->
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 表格插入对话框 -->
+    <div class="modal" id="tableModal">
+        <div class="modal-content table-modal-content">
+            <div class="modal-header">
+                <div class="modal-title">插入表格</div>
+                <button class="modal-close" id="tableModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="table-config-container">
+                    <div class="table-config-row">
+                        <label for="tableRows" class="table-config-label">行数：</label>
+                        <input type="number" id="tableRows" class="table-config-input" min="1" max="20" value="3">
+                    </div>
+                    <div class="table-config-row">
+                        <label for="tableCols" class="table-config-label">列数：</label>
+                        <input type="number" id="tableCols" class="table-config-input" min="1" max="10" value="3">
+                    </div>
+                    <div class="table-config-row">
+                        <label for="tableHeader" class="table-config-checkbox">
+                            <input type="checkbox" id="tableHeader" checked>
+                            包含标题行
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 表格预览 -->
+                <div class="table-preview-container">
+                    <div class="table-preview-title">预览：</div>
+                    <div class="table-preview" id="tablePreview">
+                        <!-- 表格预览将在这里显示 -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-cancel" id="tableModalCancel">取消</button>
+                <button class="modal-btn modal-btn-confirm" id="tableModalConfirm">插入表格</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 帮助模态框 -->
+    <div class="modal" id="helpModal">
+        <div class="modal-content help-modal-content">
+            <div class="modal-header">
+                <div class="modal-title">帮助与使用指南</div>
+                <button class="modal-close" id="helpModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="help-section">
+                    <h3>🚀 快速开始</h3>
+                    <p>中文记事本是一个现代化的文本编辑器，专为中文用户优化。</p>
+                    <ul>
+                        <li><strong>新建文档</strong>：点击工具栏"新建"按钮或按 Ctrl+N</li>
+                        <li><strong>打开文件</strong>：点击"打开"按钮选择本地文件，或按 Ctrl+O</li>
+                        <li><strong>保存文件</strong>：点击"保存"按钮自定义文件名保存，或按 Ctrl+S</li>
+                    </ul>
+                </div>
+
+                <div class="help-section">
+                    <h3>🔍 查找替换功能</h3>
+                    <p>点击工具栏"查找"按钮或按 Ctrl+F 打开查找面板：</p>
+                    <ul>
+                        <li>支持区分大小写搜索</li>
+                        <li>支持全词匹配（包括中文）</li>
+                        <li>支持正则表达式</li>
+                        <li>可进行单个替换或全部替换</li>
+                    </ul>
+                </div>
+
+                <div class="help-section">
+                    <h3>🎨 Markdown编辑</h3>
+                    <p>右侧浮动工具栏提供完整的Markdown格式化功能：</p>
+                    <div class="markdown-help-grid">
+                        <div class="markdown-help-item">
+                            <strong>基础格式</strong>
+                            <ul>
+                                <li>粗体：<code>**文本**</code></li>
+                                <li>斜体：<code>*文本*</code></li>
+                                <li>删除线：<code>~~文本~~</code></li>
+                            </ul>
+                        </div>
+                        <div class="markdown-help-item">
+                            <strong>标题</strong>
+                            <ul>
+                                <li>一级标题：<code># 标题</code></li>
+                                <li>二级标题：<code>## 标题</code></li>
+                                <li>支持1-6级标题</li>
+                            </ul>
+                        </div>
+                        <div class="markdown-help-item">
+                            <strong>列表</strong>
+                            <ul>
+                                <li>无序列表：<code>- 项目</code></li>
+                                <li>有序列表：<code>1. 项目</code></li>
+                                <li>支持缩进控制</li>
+                            </ul>
+                        </div>
+                        <div class="markdown-help-item">
+                            <strong>代码</strong>
+                            <ul>
+                                <li>行内代码：<code>`代码`</code></li>
+                                <li>代码块：<code>```代码```</code></li>
+                            </ul>
+                        </div>
+                        <div class="markdown-help-item">
+                            <strong>链接和图片</strong>
+                            <ul>
+                                <li>链接：<code>[文本](URL)</code></li>
+                                <li>图片：<code>![描述](URL)</code></li>
+                            </ul>
+                        </div>
+                        <div class="markdown-help-item">
+                            <strong>智能表格</strong>
+                            <p>点击表格按钮打开配置对话框：</p>
+                            <ul>
+                                <li>设置行数(1-20)和列数(1-10)</li>
+                                <li>选择是否包含标题行</li>
+                                <li>实时预览表格结构</li>
+                                <li>支持Enter确认、ESC关闭</li>
+                            </ul>
+                        </div>
+                        <div class="markdown-help-item">
+                            <strong>其他功能</strong>
+                            <ul>
+                                <li>引用：<code>&gt; 文本</code></li>
+                                <li>分割线：<code>---</code></li>
+                                <li>脚注：<code>[^1]</code></li>
+                                <li>Emoji表情：内置选择器</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="help-section">
+                    <h3>⌨️ 快捷键</h3>
+                    <div class="shortcut-grid">
+                        <div class="shortcut-item">
+                            <kbd>Ctrl+N</kbd>
+                            <span>新建文档</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Ctrl+O</kbd>
+                            <span>打开文件</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Ctrl+S</kbd>
+                            <span>保存文件</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Ctrl+F</kbd>
+                            <span>查找</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Ctrl+Z</kbd>
+                            <span>撤销</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Ctrl+Y</kbd>
+                            <span>重做</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Ctrl+A</kbd>
+                            <span>全选</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Esc</kbd>
+                            <span>关闭对话框</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="help-section">
+                    <h3>🎯 高级功能</h3>
+                    <ul>
+                        <li><strong>自动保存</strong>：内容自动保存到浏览器本地存储</li>
+                        <li><strong>主题切换</strong>：支持浅色/深色主题</li>
+                        <li><strong>全屏模式</strong>：专注写作环境</li>
+                        <li><strong>实时统计</strong>：显示字数、行数、光标位置</li>
+                        <li><strong>移动适配</strong>：完美支持手机和平板设备</li>
+                    </ul>
+                </div>
+
+                <div class="help-section">
+                    <h3>📁 文件格式支持</h3>
+                    <p>支持保存为多种格式：TXT, MD, HTML, CSS, JS, JSON, XML, CSV</p>
+                </div>
+
+                <div class="help-section">
+                    <h3>💡 使用技巧</h3>
+                    <ul>
+                        <li>双击状态栏中的任意统计项目可以隐藏该信息</li>
+                        <li>移动端底部滑块可以调节输入区域高度</li>
+                        <li>文本清理工具可以快速整理格式</li>
+                        <li>所有设置都会自动保存并立即生效</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-confirm" id="helpModalOkBtn">知道了</button>
             </div>
         </div>
     </div>
@@ -2059,7 +2792,7 @@
             <div class="modal-body help-modal-body">
                 <div class="help-section">
                     <h3>📝 软件介绍</h3>
-                    <p><strong>记事本</strong>是一款现代化的网页文本编辑器，专为提升您的文本编辑体验而设计。本软件采用纯前端技术实现，无需服务器支持，所有数据完全保存在您的本地设备中，确保隐私安全。</p>
+                    <p><strong>记事本 v0.1.2</strong>是一款现代化的网页文本编辑器，专为提升您的文本编辑体验而设计。本软件采用纯前端技术实现，无需服务器支持，所有数据完全保存在您的本地设备中，确保隐私安全。</p>
                     <p>作为一款轻量级但功能强大的文本编辑工具，它适合日常的文本记录、文档编写、代码编辑、Markdown写作等多种场景，支持桌面和移动设备的完美体验。</p>
                 </div>
 
@@ -2280,8 +3013,8 @@
 
                 <div class="help-section">
                     <h3>📋 版本信息</h3>
-                    <p><strong>记事本 v0.1.1-r</strong></p>
-                    <p>这是一款现代化的网页文本编辑器，持续更新以提供更好的用户体验。最新更新包括：双向查找功能、字数统计精简、查找替换界面优化、帮助文档更新、底部边距滑块功能、取消缩进功能修复。</p>
+                    <p><strong>记事本 v0.1.2</strong></p>
+                    <p>这是一款现代化的网页文本编辑器，持续更新以提供更好的用户体验。最新更新包括：智能表格生成器、完整帮助系统、Markdown工具栏优化、双击隐藏功能修复等。</p>
                     <p>功能特点：单文件部署、零依赖、离线使用、数据本地存储、响应式设计、多设备兼容。</p>
                 </div>
             </div>
@@ -2334,6 +3067,9 @@
                 });
                 // 初始检查屏幕大小（在loadPreferences后执行）
                 setTimeout(() => this.checkScreenSize(), 0);
+
+                // 恢复状态栏可见性设置
+                this.restoreStatusBarVisibility();
             }
 
             initElements() {
@@ -2444,12 +3180,107 @@
                 if (this.themeBtn) this.themeBtn.addEventListener('click', () => this.toggleTheme());
                 if (this.preferencesBtn) this.preferencesBtn.addEventListener('click', () => this.openPreferences());
 
+                // 帮助按钮事件
+                const helpBtn = document.getElementById('helpBtn');
+                if (helpBtn) helpBtn.addEventListener('click', () => this.showHelpModal());
+
                 // Markdown 工具栏事件
                 if (this.markdownBtns) {
                     this.markdownBtns.forEach(btn => {
                         btn.addEventListener('click', (e) => {
                             const action = e.currentTarget.dataset.action;
                             this.handleMarkdownAction(action);
+                        });
+                    });
+                }
+
+                // 表格对话框事件
+                const tableModalClose = document.getElementById('tableModalClose');
+                const tableModalCancel = document.getElementById('tableModalCancel');
+                const tableModalConfirm = document.getElementById('tableModalConfirm');
+                const tableRows = document.getElementById('tableRows');
+                const tableCols = document.getElementById('tableCols');
+                const tableHeader = document.getElementById('tableHeader');
+
+                if (tableModalClose) {
+                    tableModalClose.addEventListener('click', () => this.hideTableModal());
+                }
+
+                if (tableModalCancel) {
+                    tableModalCancel.addEventListener('click', () => this.hideTableModal());
+                }
+
+                if (tableModalConfirm) {
+                    tableModalConfirm.addEventListener('click', () => this.insertTableFromModal());
+                }
+
+                // 帮助模态框事件
+                const helpModalClose = document.getElementById('helpModalClose');
+                const helpModalOkBtn = document.getElementById('helpModalOkBtn');
+                const helpModal = document.getElementById('helpModal');
+
+                if (helpModalClose) {
+                    helpModalClose.addEventListener('click', () => this.hideHelpModal());
+                }
+
+                if (helpModalOkBtn) {
+                    helpModalOkBtn.addEventListener('click', () => this.hideHelpModal());
+                }
+
+                if (helpModal) {
+                    helpModal.addEventListener('click', (e) => {
+                        if (e.target === helpModal) {
+                            this.hideHelpModal();
+                        }
+                    });
+                }
+
+                // 输入框变化时更新预览
+                if (tableRows) {
+                    tableRows.addEventListener('input', () => this.updateTablePreview());
+                }
+
+                if (tableCols) {
+                    tableCols.addEventListener('input', () => this.updateTablePreview());
+                }
+
+                if (tableHeader) {
+                    tableHeader.addEventListener('change', () => this.updateTablePreview());
+                }
+
+                // 点击模态框外部关闭
+                const tableModal = document.getElementById('tableModal');
+                if (tableModal) {
+                    tableModal.addEventListener('click', (e) => {
+                        if (e.target === tableModal) {
+                            this.hideTableModal();
+                        }
+                    });
+                }
+
+                // ESC键关闭模态框
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        const tableModal = document.getElementById('tableModal');
+                        const helpModal = document.getElementById('helpModal');
+
+                        if (tableModal && tableModal.classList.contains('active')) {
+                            this.hideTableModal();
+                        }
+                        if (helpModal && helpModal.classList.contains('active')) {
+                            this.hideHelpModal();
+                        }
+                    }
+                });
+
+                // Enter键确认插入（焦点在输入框时）
+                if (tableRows && tableCols) {
+                    [tableRows, tableCols].forEach(input => {
+                        input.addEventListener('keydown', (e) => {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                this.insertTableFromModal();
+                            }
                         });
                     });
                 }
@@ -2485,6 +3316,27 @@
                         // 同步滚动（如果有行号显示）
                     });
                 }
+
+                // 状态栏双击切换显示/隐藏功能
+                const statusItems = [
+                    'charCount', 'wordCount', 'lineCount', 'selectedCount',
+                    'colCount', 'positionPercent', 'dateTimeDisplay'
+                ];
+
+                statusItems.forEach(itemId => {
+                    const element = document.getElementById(itemId);
+                    if (element) {
+                        element.addEventListener('dblclick', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            this.hideStatusItem(element);
+                        });
+
+                        // 添加样式提示用户可以双击隐藏
+                        element.style.cursor = 'pointer';
+                        element.title = element.title || '双击隐藏此项目';
+                    }
+                });
 
                 // 全局选择变化事件
                 document.addEventListener('selectionchange', () => {
@@ -3881,6 +4733,9 @@
                     }
                 }
 
+                // 更新本地存储的状态栏项目可见性设置
+                this.updateStatusBarVisibilityInStorage(preferences);
+
                 // Markdown mode
                 if (preferences.markdownMode) {
                     if (this.markdownToolbar.classList.contains('collapsed')) {
@@ -4050,6 +4905,12 @@
                 let newCursorPos = start;
 
                 switch (action) {
+                    // Emoji功能 - 保留
+                    case 'emoji':
+                        this.showEmojiModal();
+                        return; // 直接返回，不执行后续插入操作
+
+                    // 基础格式
                     case 'bold':
                         replacement = `**${selectedText || '粗体文本'}**`;
                         newCursorPos = start + (selectedText ? replacement.length : 2);
@@ -4062,18 +4923,8 @@
                         replacement = `~~${selectedText || '删除线文本'}~~`;
                         newCursorPos = start + (selectedText ? replacement.length : 2);
                         break;
-                    case 'highlight':
-                        replacement = `==${selectedText || '高亮文本'}==`;
-                        newCursorPos = start + (selectedText ? replacement.length : 2);
-                        break;
-                    case 'superscript':
-                        replacement = `^${selectedText || '上标'}^`;
-                        newCursorPos = start + (selectedText ? replacement.length : 1);
-                        break;
-                    case 'subscript':
-                        replacement = `~${selectedText || '下标'}~`;
-                        newCursorPos = start + (selectedText ? replacement.length : 1);
-                        break;
+
+                    // 标题
                     case 'h1':
                         replacement = `# ${selectedText || '一级标题'}`;
                         newCursorPos = start + replacement.length;
@@ -4086,6 +4937,20 @@
                         replacement = `### ${selectedText || '三级标题'}`;
                         newCursorPos = start + replacement.length;
                         break;
+                    case 'h4':
+                        replacement = `#### ${selectedText || '四级标题'}`;
+                        newCursorPos = start + replacement.length;
+                        break;
+                    case 'h5':
+                        replacement = `##### ${selectedText || '五级标题'}`;
+                        newCursorPos = start + replacement.length;
+                        break;
+                    case 'h6':
+                        replacement = `###### ${selectedText || '六级标题'}`;
+                        newCursorPos = start + replacement.length;
+                        break;
+
+                    // 引用和代码
                     case 'quote':
                         replacement = `> ${selectedText || '引用文本'}`;
                         newCursorPos = start + replacement.length;
@@ -4098,16 +4963,14 @@
                         replacement = `\`\`\`${selectedText ? '\n' + selectedText + '\n' : ''}\n\`\`\``;
                         newCursorPos = start + (selectedText ? replacement.length - 4 : 4);
                         break;
+
+                    // 列表
                     case 'ul':
                         replacement = `- ${selectedText || '列表项'}`;
                         newCursorPos = start + replacement.length;
                         break;
                     case 'ol':
                         replacement = `1. ${selectedText || '列表项'}`;
-                        newCursorPos = start + replacement.length;
-                        break;
-                    case 'tasklist':
-                        replacement = `- [${selectedText ? 'x' : ' '}] ${selectedText || '任务项'}`;
                         newCursorPos = start + replacement.length;
                         break;
                     case 'indent':
@@ -4132,7 +4995,7 @@
                             // 如果没有选中文本，处理当前行的缩进
                             const text = this.editor.value;
                             const lines = text.split('\n');
-                            
+
                             // 计算光标在第几行
                             let totalChars = 0;
                             let currentLineIndex = 0;
@@ -4144,16 +5007,16 @@
                                 // 加上当前行的字符数和换行符
                                 totalChars += lines[i].length + 1;
                             }
-                            
+
                             // 获取当前行内容
                             const currentLine = lines[currentLineIndex];
-                            
+
                             // 检查当前行是否有缩进
                             const indentMatch = currentLine.match(/^[ \t]+/);
                             if (indentMatch) {
                                 const indent = indentMatch[0];
                                 let newIndent;
-                                
+
                                 // 移除缩进
                                 if (indent.startsWith('\t')) {
                                     // 移除一个制表符
@@ -4163,28 +5026,28 @@
                                     const spacesToRemove = Math.min(4, indent.length);
                                     newIndent = indent.substring(spacesToRemove);
                                 }
-                                
+
                                 // 构建新行
                                 const newLine = newIndent + currentLine.substring(indent.length);
                                 lines[currentLineIndex] = newLine;
-                                
+
                                 // 更新编辑器内容
                                 this.editor.value = lines.join('\n');
-                                
+
                                 // 更新光标位置
                                 // 计算当前行在文本中的起始位置
                                 let lineStartPos = 0;
                                 for (let i = 0; i < currentLineIndex; i++) {
                                     lineStartPos += lines[i].length + 1;
                                 }
-                                
+
                                 // 新光标位置 = 行起始位置 + 新行长度
                                 newCursorPos = lineStartPos + newLine.length;
-                                
+
                                 // 更新统计和历史
                                 this.updateStats();
                                 this.saveHistory();
-                                
+
                                 // 重新聚焦编辑器并设置光标位置
                                 this.editor.focus();
                                 this.editor.setSelectionRange(newCursorPos, newCursorPos);
@@ -4196,6 +5059,8 @@
                         }
                         newCursorPos = start + replacement.length;
                         break;
+
+                    // 链接和媒体
                     case 'link':
                         replacement = `[${selectedText || '链接文本'}](URL)`;
                         newCursorPos = start + (selectedText ? replacement.length - 4 : 1); // Position at URL
@@ -4204,57 +5069,20 @@
                         replacement = `![${selectedText || '图片描述'}](图片URL)`;
                         newCursorPos = start + (selectedText ? replacement.length - 5 : 2); // Position at URL
                         break;
-                    case 'email':
-                        replacement = `[${selectedText || '邮箱地址'}](mailto:email@example.com)`;
-                        newCursorPos = start + (selectedText ? replacement.length - 20 : 1); // Position at email
-                        break;
-                    case 'video':
-                        replacement = `[${selectedText || '视频标题'}](视频URL)`;
-                        newCursorPos = start + (selectedText ? replacement.length - 5 : 1); // Position at URL
-                        break;
-                    case 'audio':
-                        replacement = `[${selectedText || '音频标题'}](音频URL)`;
-                        newCursorPos = start + (selectedText ? replacement.length - 5 : 1); // Position at URL
-                        break;
+
+                    // 表格和分隔
                     case 'table':
-                        replacement = '| 列1 | 列2 | 列3 |\n|-----|-----|-----|\n| 数据1 | 数据2 | 数据3 |\n';
-                        newCursorPos = start + 32; // Position at "数据1"
-                        break;
+                        this.showTableModal();
+                        return; // 直接返回，不执行后续插入操作
                     case 'hr':
                         replacement = '---\n';
                         newCursorPos = start + replacement.length;
                         break;
-                    case 'toc':
-                        replacement = '## 目录\n\n- [章节1](#章节1)\n- [章节2](#章节2)\n- [章节3](#章节3)\n\n';
-                        newCursorPos = start + replacement.length;
-                        break;
+
+                    // 脚注
                     case 'footnote':
                         const footnoteId = Math.floor(Math.random() * 1000);
                         replacement = `${selectedText || '文本'}[^${footnoteId}]\n\n[^${footnoteId}]: 脚注内容`;
-                        newCursorPos = start + replacement.length;
-                        break;
-                    case 'math':
-                        replacement = `$${selectedText || 'E=mc²'}$`;
-                        newCursorPos = start + (selectedText ? replacement.length : 1);
-                        break;
-                    case 'emoji':
-                        this.showEmojiModal();
-                        return; // 直接返回，不执行后续插入操作
-                    case 'date':
-                        const now = new Date();
-                        replacement = selectedText || now.toLocaleString('zh-CN');
-                        newCursorPos = start + replacement.length;
-                        break;
-                    case 'mermaid':
-                        replacement = '```mermaid\ngraph TD\n    A[开始] --> B[过程]\n    B --> C[结束]\n```';
-                        newCursorPos = start + replacement.length;
-                        break;
-                    case 'details':
-                        replacement = `<details>\n<summary>${selectedText || '点击展开'}</summary>\n\n这里是隐藏的内容\n\n</details>`;
-                        newCursorPos = start + replacement.length;
-                        break;
-                    case 'mark':
-                        replacement = `📌 ${selectedText || '标记内容'}`;
                         newCursorPos = start + replacement.length;
                         break;
                 }
@@ -4426,8 +5254,124 @@
                 // 立即保存到localStorage
                 localStorage.setItem('notepad-preferences', JSON.stringify(preferences));
 
-                // 立即应用设置
-                this.applyPreferences(preferences);
+                // 应用设置但不重复更新状态栏可见性存储（避免循环）
+                this.applyPreferencesWithoutStatusBarUpdate(preferences);
+            }
+
+            // 应用偏好设置但不更新状态栏可见性存储（避免循环调用）
+            applyPreferencesWithoutStatusBarUpdate(preferences) {
+                // Apply status bar item visibility using the original initialized element references
+                const applyElementVisibility = (element, preferenceValue, logName) => {
+                    if (element) {
+                        // Log for debugging
+                        console.log(`Setting ${logName} visibility: ${preferenceValue}`);
+
+                        if (preferenceValue === false) {
+                            // 使用更强制的方式隐藏元素，覆盖内联样式中的 !important
+                            element.style.display = 'none';
+                        } else {
+                            // 恢复显示，移除通过代码添加的 display 样式
+                            element.style.display = '';
+                            // 如果之前有 hidden 类，也移除它
+                            element.classList.remove('hidden');
+                        }
+                    } else {
+                        console.warn(`Element for ${logName} not found`);
+                    }
+                };
+
+                // Apply to each status bar element using original references
+                applyElementVisibility(this.charCount, preferences.showCharCount, 'charCount');
+                applyElementVisibility(this.wordCount, preferences.showWordCount, 'wordCount');
+                applyElementVisibility(this.lineCount, preferences.showLineCount, 'lineCount');
+                applyElementVisibility(this.selectedCount, preferences.showSelectedCount, 'selectedCount');
+                applyElementVisibility(this.colCount, preferences.showColCount, 'colCount');
+                applyElementVisibility(this.positionPercent, preferences.showPositionPercent, 'positionPercent');
+
+                // Special handling for datetime display
+                if (this.dateTimeDisplay) {
+                    if (preferences.showDateTime === false) {
+                        // 使用更强制的方式隐藏元素，覆盖内联样式中的 !important
+                        this.dateTimeDisplay.style.display = 'none';
+                        // 停止时间更新以节省资源
+                        if (this.timeUpdateInterval) {
+                            clearInterval(this.timeUpdateInterval);
+                            this.timeUpdateInterval = null;
+                        }
+                    } else {
+                        // 恢复显示，移除通过代码添加的 display 样式
+                        this.dateTimeDisplay.style.display = '';
+                        // 如果之前有 hidden 类，也移除它
+                        this.dateTimeDisplay.classList.remove('hidden');
+                        // 确保时间更新已启动
+                        if (!this.timeUpdateInterval) {
+                            this.startTimeUpdate();
+                        }
+                    }
+                }
+
+                // Markdown mode
+                if (preferences.markdownMode) {
+                    if (this.markdownToolbar.classList.contains('collapsed')) {
+                        this.markdownToolbar.classList.remove('collapsed');
+                    }
+                    document.body.classList.add('markdown-visible');
+                } else {
+                    if (!this.markdownToolbar.classList.contains('collapsed')) {
+                        this.markdownToolbar.classList.add('collapsed');
+                    }
+                    document.body.classList.remove('markdown-visible');
+                }
+
+                // Auto word wrap functionality
+                this.applyAutoWordWrap(preferences.autoWordWrap);
+                // Update screen size after applying auto word wrap
+                this.checkScreenSize();
+
+                // Grid background display
+                const editorWrapper = this.editor?.parentElement || document.querySelector('.editor-wrapper');
+
+                if (editorWrapper) {
+                    if (preferences.showGrid) {
+                        editorWrapper.classList.add('show-grid');
+                        // 移除编辑器元素的内联背景样式，让CSS样式生效
+                        if (this.editor) {
+                            this.editor.style.backgroundImage = '';
+                        }
+                    } else {
+                        editorWrapper.classList.remove('show-grid');
+                        // 明确设置编辑器背景为无，覆盖内联样式
+                        if (this.editor) {
+                            this.editor.style.backgroundImage = 'none';
+                        }
+                    }
+                }
+
+                // Fullscreen mode
+                if (preferences.enableFullscreen) {
+                    // 启用全屏模式
+                    if (!document.fullscreenElement && !document.body.classList.contains('fullscreen')) {
+                        // 只有在当前不是全屏状态时才进入全屏
+                        document.documentElement.requestFullscreen().catch((err) => {
+                            console.warn('进入全屏失败:', err);
+                            // 即使浏览器全屏API失败，也要添加CSS类
+                            document.body.classList.add('fullscreen');
+                        });
+                    }
+                } else {
+                    // 禁用全屏模式
+                    if (document.fullscreenElement) {
+                        // 如果当前是全屏状态，则退出全屏
+                        document.exitFullscreen().catch((err) => {
+                            console.warn('退出全屏失败:', err);
+                            // 即使浏览器全屏API失败，也要移除CSS类
+                            document.body.classList.remove('fullscreen');
+                        });
+                    } else {
+                        // 如果当前不是全屏状态，但CSS类存在，则移除它
+                        document.body.classList.remove('fullscreen');
+                    }
+                }
             }
 
 
@@ -4868,17 +5812,301 @@
                 if (this.bottomMarginSlider) {
                     bottomMargin = parseInt(this.bottomMarginSlider.value) || 175;
                 }
-                
+
                 // 设置编辑器容器的底部边距
                 const editorContainer = document.querySelector('.editor-container');
                 if (editorContainer) {
                     editorContainer.style.marginBottom = `${bottomMargin}px`;
                 }
-                
+
                 // 如果有编辑器父元素，设置其底部内边距为0
                 if (this.editor && this.editor.parentElement) {
                     this.editor.parentElement.style.paddingBottom = '0px';
                 }
+            }
+
+            // 表格对话框相关方法
+            showTableModal() {
+                const modal = document.getElementById('tableModal');
+                if (!modal) return;
+
+                // 设置默认值
+                const rowsInput = document.getElementById('tableRows');
+                const colsInput = document.getElementById('tableCols');
+                const headerCheckbox = document.getElementById('tableHeader');
+
+                if (rowsInput) rowsInput.value = 3;
+                if (colsInput) colsInput.value = 3;
+                if (headerCheckbox) headerCheckbox.checked = true;
+
+                // 更新预览
+                this.updateTablePreview();
+
+                // 显示模态框
+                modal.classList.add('active');
+
+                // 聚焦到行数输入框
+                setTimeout(() => {
+                    if (rowsInput) rowsInput.focus();
+                }, 100);
+            }
+
+            hideTableModal() {
+                const modal = document.getElementById('tableModal');
+                if (modal) {
+                    modal.classList.remove('active');
+                }
+            }
+
+            generateTableMarkdown(rows, cols, includeHeader) {
+                if (rows < 1 || cols < 1) return '';
+
+                let table = '';
+
+                // 生成表头（如果包含标题行）
+                if (includeHeader && rows >= 1) {
+                    let headerRow = '|';
+                    let separatorRow = '|';
+
+                    for (let j = 0; j < cols; j++) {
+                        headerRow += ` 标题${j + 1} |`;
+                        separatorRow += '---|';
+                    }
+
+                    table += headerRow + '\n' + separatorRow + '\n';
+
+                    // 生成数据行（剩余行数）
+                    for (let i = 1; i < rows; i++) {
+                        let dataRow = '|';
+                        for (let j = 0; j < cols; j++) {
+                            dataRow += ` 数据${i}-${j + 1} |`;
+                        }
+                        table += dataRow + '\n';
+                    }
+                } else {
+                    // 不包含标题行，全部为数据行
+                    for (let i = 0; i < rows; i++) {
+                        let dataRow = '|';
+                        for (let j = 0; j < cols; j++) {
+                            dataRow += ` 数据${i + 1}-${j + 1} |`;
+                        }
+                        table += dataRow + '\n';
+                    }
+                }
+
+                return table;
+            }
+
+            updateTablePreview() {
+                const rowsInput = document.getElementById('tableRows');
+                const colsInput = document.getElementById('tableCols');
+                const headerCheckbox = document.getElementById('tableHeader');
+                const preview = document.getElementById('tablePreview');
+
+                if (!rowsInput || !colsInput || !headerCheckbox || !preview) return;
+
+                const rows = parseInt(rowsInput.value) || 3;
+                const cols = parseInt(colsInput.value) || 3;
+                const includeHeader = headerCheckbox.checked;
+
+                // 限制行列数
+                if (rows > 20) rowsInput.value = 20;
+                if (cols > 10) colsInput.value = 10;
+                if (rows < 1) rowsInput.value = 1;
+                if (cols < 1) colsInput.value = 1;
+
+                const tableMarkdown = this.generateTableMarkdown(rows, cols, includeHeader);
+
+                // 限制预览显示的行数
+                const lines = tableMarkdown.split('\n');
+                const maxPreviewLines = 10;
+                let previewText = lines.slice(0, maxPreviewLines).join('\n');
+
+                if (lines.length > maxPreviewLines) {
+                    previewText += '\n... (更多行)';
+                }
+
+                preview.textContent = previewText;
+            }
+
+            insertTableFromModal() {
+                const rowsInput = document.getElementById('tableRows');
+                const colsInput = document.getElementById('tableCols');
+                const headerCheckbox = document.getElementById('tableHeader');
+
+                if (!rowsInput || !colsInput || !headerCheckbox) return;
+
+                const rows = parseInt(rowsInput.value) || 3;
+                const cols = parseInt(colsInput.value) || 3;
+                const includeHeader = headerCheckbox.checked;
+
+                const tableMarkdown = this.generateTableMarkdown(rows, cols, includeHeader);
+
+                // 获取光标位置并插入表格
+                const start = this.editor.selectionStart;
+                const end = this.editor.selectionEnd;
+
+                this.editor.value = this.editor.value.substring(0, start) +
+                                  tableMarkdown +
+                                  this.editor.value.substring(end);
+
+                // 设置光标位置到表格后
+                const newCursorPos = start + tableMarkdown.length;
+                this.editor.focus();
+                this.editor.setSelectionRange(newCursorPos, newCursorPos);
+
+                // 更新统计和历史
+                this.updateStats();
+                this.saveHistory();
+
+                // 关闭模态框
+                this.hideTableModal();
+            }
+
+            // 帮助模态框相关方法
+            showHelpModal() {
+                const modal = document.getElementById('helpModal');
+                if (modal) {
+                    modal.classList.add('active');
+                }
+            }
+
+            hideHelpModal() {
+                const modal = document.getElementById('helpModal');
+                if (modal) {
+                    modal.classList.remove('active');
+                }
+            }
+
+            // 状态栏项目隐藏功能（仅支持隐藏）
+            hideStatusItem(element) {
+                if (!element) return;
+
+                // 使用 getComputedStyle 获取准确的显示状态
+                const computedStyle = window.getComputedStyle(element);
+                const isVisible = computedStyle.display !== 'none';
+
+                if (isVisible) {
+                    // 隐藏元素
+                    element.style.display = 'none';
+                    // 保存到本地存储
+                    const itemId = element.id;
+                    if (itemId) {
+                        localStorage.setItem(`status_${itemId}_visible`, 'false');
+                    }
+
+                    // 同步更新偏好设置中的对应复选框
+                    this.syncPreferenceWithStatusItem(itemId, false);
+
+                    // 提供视觉反馈
+                    this.showTemporaryMessage(element, '已隐藏');
+                }
+            }
+
+            // 显示临时消息
+            showTemporaryMessage(element, message) {
+                if (!element) return;
+
+                const originalText = element.textContent;
+                const originalTitle = element.title;
+
+                // 临时显示消息
+                element.textContent = message;
+                element.style.backgroundColor = 'var(--accent-color)';
+                element.style.color = 'white';
+                element.style.fontWeight = 'bold';
+
+                // 500ms后恢复
+                setTimeout(() => {
+                    element.textContent = originalText;
+                    element.style.backgroundColor = '';
+                    element.style.color = '';
+                    element.style.fontWeight = '';
+                    element.title = originalTitle;
+                }, 500);
+            }
+
+            // 恢复状态栏项目可见性设置
+            restoreStatusBarVisibility() {
+                const statusItems = [
+                    'charCount', 'wordCount', 'lineCount', 'selectedCount',
+                    'colCount', 'positionPercent', 'dateTimeDisplay'
+                ];
+
+                statusItems.forEach(itemId => {
+                    const element = document.getElementById(itemId);
+                    if (element) {
+                        const savedState = localStorage.getItem(`status_${itemId}_visible`);
+                        if (savedState === 'false') {
+                            element.style.display = 'none';
+                        } else {
+                            element.style.display = 'inline-block';
+                        }
+                        
+                        // 在恢复可见性后同步更新偏好设置中的对应复选框
+                        // 使用 setTimeout 确保 DOM 已经更新
+                        setTimeout(() => {
+                            const isVisible = element.style.display !== 'none';
+                            this.syncPreferenceWithStatusItem(itemId, isVisible);
+                        }, 0);
+                    }
+                });
+            }
+
+            // 同步状态栏项目与偏好设置
+            syncPreferenceWithStatusItem(itemId, isVisible) {
+                // 根据itemId映射到对应的偏好设置项
+                const preferenceMap = {
+                    'charCount': 'showCharCount',
+                    'wordCount': 'showWordCount',
+                    'lineCount': 'showLineCount',
+                    'selectedCount': 'showSelectedCount',
+                    'colCount': 'showColCount',
+                    'positionPercent': 'showPositionPercent',
+                    'dateTimeDisplay': 'showDateTime'
+                };
+
+                const preferenceKey = preferenceMap[itemId];
+                if (preferenceKey && this[preferenceKey]) {
+                    // 更新偏好设置复选框的状态
+                    this[preferenceKey].checked = isVisible;
+                    
+                    // 只保存偏好设置，不立即应用，避免循环调用
+                    const preferences = {
+                        showWordCount: this.showWordCount.checked,
+                        showCharCount: this.showCharCount.checked,
+                        showLineCount: this.showLineCount.checked,
+                        showColCount: this.showColCount.checked,
+                        showSelectedCount: this.showSelectedCount.checked,
+                        showPositionPercent: this.showPositionPercent.checked,
+                        showDateTime: this.showDateTime.checked,
+                        markdownMode: this.markdownMode.checked,
+                        autoWordWrap: this.autoWordWrap.checked,
+                        enableFullscreen: this.enableFullscreen.checked,
+                        showGrid: this.showGrid.checked,
+                        bottomMargin: this.bottomMarginSlider ? this.bottomMarginSlider.value : 175
+                    };
+                    
+                    // 立即保存到localStorage
+                    localStorage.setItem('notepad-preferences', JSON.stringify(preferences));
+                }
+            }
+
+            // 更新本地存储的状态栏项目可见性设置
+            updateStatusBarVisibilityInStorage(preferences) {
+                const statusItems = [
+                    { id: 'charCount', visible: preferences.showCharCount !== false },
+                    { id: 'wordCount', visible: preferences.showWordCount !== false },
+                    { id: 'lineCount', visible: preferences.showLineCount !== false },
+                    { id: 'selectedCount', visible: preferences.showSelectedCount !== false },
+                    { id: 'colCount', visible: preferences.showColCount !== false },
+                    { id: 'positionPercent', visible: preferences.showPositionPercent !== false },
+                    { id: 'dateTimeDisplay', visible: preferences.showDateTime !== false }
+                ];
+
+                statusItems.forEach(item => {
+                    localStorage.setItem(`status_${item.id}_visible`, item.visible);
+                });
             }
         }
 

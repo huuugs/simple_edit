@@ -199,3 +199,5 @@ if (index < 0 || index >= array.length) {
 - No build step or optimization required
 - CDN-free: All assets embedded in HTML file
 - HTTPS recommended for full Clipboard API functionality
+- to
+- t
